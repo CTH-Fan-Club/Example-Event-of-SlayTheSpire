@@ -1,10 +1,10 @@
 # Example-Event-of-SlayTheSpire
 This is an example about how to make a simple event in STS.
 ## 这是一个关于如何在使用你的MOD在游戏中添加事件($events$)的教程
-如果你已经了解过如何在游戏中添加卡牌，遗物，人物，但是还尚不清楚如何添加事件，可以参考一下本教程。
+如果你已经了解过如何在游戏中添加卡牌，遗物，但是还尚不清楚如何添加事件，可以参考一下本教程。
 
 ### First Step.
-假如我们想要编写一个能像玩家手牌中添加卡牌的事件， <br>
+假如我们想要编写一个能像玩家手牌中添加卡牌的事件（最终实现的效果图可以参考文件里“效果图”文件夹里的图片）， <br>
 <b>首先</b>，在你的MOD目录下创建一个 $events$ 文件夹用以存储你所写的事件，创建一个 $ExampleEvent$ 类，这个类就是你要实现的事件的主体，
 ```java
 public class ExampleEvent
@@ -88,8 +88,8 @@ case INTRO:
   this.imageEventText.setDialogOption(OPTIONS[4],c4.makeStatEquivalentCopy());
   return;
 ```
-##### AbstractImageEvent.imageEventText.setDialogOption(String text)        //为你的事件添加文本为text的选项
-##### AbstractImageEvent.imageEventText.setDialogOption(String text,AbstractCard card)        //当你的鼠标落在选项上时，可以在选项右侧显示一张卡牌card的缩略图
+##### imageEventText.setDialogOption(String text)        //为你的事件添加文本为text的选项
+##### imageEventText.setDialogOption(String text,AbstractCard card)        //当你的鼠标落在选项上时，可以在选项右侧显示一张卡牌card的缩略图
 游戏内部提供的更多方法在此就不展开说了，可以去参考反编译代码。<br>
 下面是CHOICE部分，
 ```java
