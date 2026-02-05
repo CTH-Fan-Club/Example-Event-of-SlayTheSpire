@@ -36,6 +36,8 @@ public class ExampleEvent
 
     public ExampleEvent() {
         super(NAME, DIALOG_1, "ExampleModResources/img/events/ExampleEvent.jpg");
+        //第3个参数是你resources文件夹下事件图片的存储路径，分辨率一般为600x600，会显示在事件栏左侧
+
         this.imageEventText.setDialogOption(OPTIONS[0]);
         setCard();  //设置这四张卡牌具体是哪四张
     }
@@ -78,12 +80,83 @@ case INTRO:
   this.screen = CurScreen.CHOICE;  //执行完 $INTRO$ 后转到下一进程
   this.imageEventText.updateBodyText(DIALOG_2);  //更新一下主体的文本
 
-  this.imageEventText.clearAllDialogs();
-
+  this.imageEventText.clearAllDialogs();  //清空所有的选项（按钮）
+        //添加新的选项
   this.imageEventText.setDialogOption(OPTIONS[1],c1.makeStatEquivalentCopy());
   this.imageEventText.setDialogOption(OPTIONS[2],c2.makeStatEquivalentCopy());
   this.imageEventText.setDialogOption(OPTIONS[3],c3.makeStatEquivalentCopy());
   this.imageEventText.setDialogOption(OPTIONS[4],c4.makeStatEquivalentCopy());
   return;
 ```
-     
+##### AbstractImageEvent.imageEventText.setDialogOption(String text)        //为你的事件添加文本为text的选项
+##### AbstractImageEvent.imageEventText.setDialogOption(String text,AbstractCard card)        //当你的鼠标落在选项上时，可以在选项右侧显示一张卡牌card的缩略图
+游戏内部提供的更多方法在此就不展开说了，可以去参考反编译代码。<br>
+下面是CHOICE部分，
+```java
+case CHOICE:
+                AbstractPlayer p=AbstractDungeon.player;        //首先获取一下当前楼层中的玩家
+                this.screen = CurScreen.RESULT;        //和上文一样，为事件的下一步切换进程
+                this.imageEventText.clearAllDialogs();
+                switch (buttonPressed) {        //buttonPressed获取的即是玩家点击按钮后的返回值，一般来说，0代表从上往下第一个按钮，1代表第二个......
+                    case 0:
+                        AbstractDungeon.effectList.add(new ShowCardAndObtainEffect(
+                                CardLibrary.getCopy(((AbstractCard)c1).cardID), (Settings.WIDTH / 2),
+                                (Settings.HEIGHT / 2)));        //获取一张卡，并播放获得卡牌的特效（动画），这样设置x,y位置大概是相对于屏幕从正中央开始播放
+                        break;
+
+                    case 1:
+                        AbstractDungeon.effectList.add(new ShowCardAndObtainEffect(
+                                CardLibrary.getCopy(((AbstractCard)c2).cardID), (Settings.WIDTH / 2),
+                                (Settings.HEIGHT / 2)));
+                        break;
+                    case 2:
+                        AbstractDungeon.effectList.add(new ShowCardAndObtainEffect(
+                                CardLibrary.getCopy(((AbstractCard)c3).cardID), (Settings.WIDTH / 2),
+                                (Settings.HEIGHT / 2)));
+                        break;
+                    case 3:
+                        AbstractDungeon.effectList.add(new ShowCardAndObtainEffect(
+                                CardLibrary.getCopy(((AbstractCard)c4).cardID), (Settings.WIDTH / 2),
+                                (Settings.HEIGHT / 2)));
+                        break;
+
+                this.imageEventText.updateBodyText(DIALOG_3);        
+                this.imageEventText.setDialogOption(OPTIONS[5]);
+                return;
+```
+最后在switch语句结束后，不要忘了写一个`openMap()`来让玩家回到我们的地图中去，这部分最终的代码可以参考我上传的文件，
+
+### Third Step.
+最后，别忘了在 $BaseMod$ 中注册一下该事件，并写一下你的本地化文本（如果你加了本地化的话）
+```java
+    @Override
+    public void receivePostInitialize(){
+        BaseMod.addEvent(ExampleEvent.ID, ExampleEvent.class);
+    }
+
+    public void receiveEditStrings() {
+        ......省略
+        BaseMod.loadCustomStringsFile(EventStrings.class,"ExampleModResources/localization/" + language + "/events.json");
+    }
+
+```
+```java
+{
+  "ExampleMod:ExampleEvent": {
+    "NAME": "示例事件",
+    "DESCRIPTIONS": [
+      "你走进了一个漆黑的房间",
+      "在无边的黑暗中，你仿佛看到了远处闪烁着4种颜色的光",
+      "你感觉到身体发生了某种变化"
+    ],
+    "OPTIONS": [
+      "[继续]",
+      "[走向红光] 获得 #r恶魔形态",
+      "[走向绿光] 获得 #g幽魂形态",
+      "[走向蓝光] 获得 #b回响形态",
+      "[走向紫光] 获得 #p天人形态",
+      "[继续前进]"
+    ]
+  }
+}
+```
